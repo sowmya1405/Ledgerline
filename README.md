@@ -17,18 +17,18 @@ It is built using React, Node.js, Express.js, PostgreSQL and Prisma ORM, with Do
 
 The Ledgerline dashboard provides an overview of customer accounts, account balances, quick financial actions and recent transactions.
 
-![Ledgerline Customer Dashboard](screenshots/dashboard.png)
-
-### Login Page
-![Login Page](screenshots/login.png)
-
 ### Customer Dashboard
 ![Customer Dashboard](screenshots/dashboard.png)
 
 ### Transaction History
-![Transaction History](screenshots/transactions.png)
 
+Ledgerline provides a transaction history interface that allows users to review their financial activities, search transactions and filter records by transaction type and date.
+
+![Transaction History](screenshots/transactions.png)
 ### Admin Dashboard
+
+The administrative dashboard provides an overview of customer accounts, account status monitoring, search and filtering capabilities, and account freeze and activation controls.
+
 ![Admin Dashboard](screenshots/admin-dashboard.png)
 
 ### Authentication & Authorization
