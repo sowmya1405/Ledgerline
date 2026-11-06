@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import { QRCodeSVG } from "qrcode.react";
 import {
   Wallet,
   LayoutDashboard,
@@ -423,6 +424,15 @@ const handleTransfer = async (e) => {
             <History size={19} />
             History
           </Link>
+
+          <a
+            href="#profile"
+            className={`nav-item ${activeSection === "profile" ? "active" : ""}`}
+            onClick={() => setActiveSection("profile")}
+          >
+            <User size={19} />
+            My Profile
+          </a>
         </nav>
 
         <div className="sidebar-bottom">
@@ -753,6 +763,87 @@ const handleTransfer = async (e) => {
 
         </section>
 
+        {/* MY PROFILE */}
+<section className="dashboard-section" id="profile">
+  <div className="section-heading">
+    <div>
+      <h2>My Profile</h2>
+      <p>Your registered Ledgerline user details</p>
+    </div>
+  </div>
+
+  <div className="account-card">
+    <div className="account-card-top">
+      <div className="account-icon">
+        <User size={22} />
+      </div>
+      <span className="account-status active">ACCOUNT HOLDER</span>
+    </div>
+
+    <p className="account-number">Full Name</p>
+    <h3>{user?.name || "—"}</h3>
+
+    <p className="account-number" style={{ marginTop: "18px" }}>
+      Email Address
+    </p>
+    <h3>{user?.email || "—"}</h3>
+
+    <p className="account-number" style={{ marginTop: "18px" }}>
+      User ID (UUID)
+    </p>
+
+    <div style={{ display: "flex", alignItems: "center", gap: "10px", flexWrap: "wrap" }}>
+      <code style={{ overflowWrap: "anywhere" }}>
+        {user?.id || "Not available"}
+      </code>
+
+      {user?.id && (
+        <button
+          type="button"
+          className="add-account-button"
+          onClick={async () => {
+            try {
+              await navigator.clipboard.writeText(user.id);
+              setSuccessMessage("User ID copied to clipboard.");
+            } catch {
+              setError("Unable to copy User ID.");
+            }
+          }}
+        >
+          Copy ID
+        </button>
+      )}
+    </div>
+
+    {user?.id && (
+      <div style={{ marginTop: "25px", textAlign: "center" }}>
+        <h3 style={{ marginBottom: "15px" }}>Your QR Code</h3>
+
+        <div style={{
+          display: "inline-block",
+          background: "white",
+          padding: "16px",
+          borderRadius: "12px"
+        }}>
+          <QRCodeSVG
+  value={`https://ledgerline-frontend-q3tm.onrender.com/user/${user.id}`}
+  size={180}
+  level="H"
+  includeMargin
+/>
+        </div>
+
+        <p className="status-message" style={{ marginTop: "12px" }}>
+          Scan this QR code to retrieve your User ID.
+        </p>
+      </div>
+    )}
+
+    <p className="status-message" style={{ marginTop: "15px" }}>
+      Your User ID is different from your bank account ID and account number.
+    </p>
+  </div>
+</section>
       </main>
 
       {/* CREATE ACCOUNT MODAL */}

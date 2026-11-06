@@ -1,4 +1,5 @@
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import PublicUser from "./pages/PublicUser";
 import { AuthProvider, useAuth } from "./context/AuthContext";
 import Dashboard from "./pages/Dashboard";
 import TransactionHistory from "./pages/TransactionHistory";
@@ -89,6 +90,7 @@ function AppRoutes() {
           </ProtectedRoute>
         }
       />
+      <Route path="/user/:id" element={<PublicUser />} />
 
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
