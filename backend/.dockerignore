@@ -1,0 +1,8 @@
+@"
+node_modules
+.env
+.env.test
+coverage
+.git
+npm-debug.log
+"@ | Set-Content .dockerignore
