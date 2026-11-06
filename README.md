@@ -13,6 +13,12 @@ It is built using React, Node.js, Express.js, PostgreSQL and Prisma ORM, with Do
 ## Key Features
 ## Application Screenshots
 
+### Customer Dashboard
+
+The Ledgerline dashboard provides an overview of customer accounts, account balances, quick financial actions and recent transactions.
+
+![Ledgerline Customer Dashboard](screenshots/dashboard.png)
+
 ### Login Page
 ![Login Page](screenshots/login.png)
 
