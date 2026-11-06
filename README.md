@@ -11,6 +11,19 @@ The application uses a double-entry accounting approach to maintain transaction 
 It is built using React, Node.js, Express.js, PostgreSQL and Prisma ORM, with Docker support for containerized deployment.
 
 ## Key Features
+## Application Screenshots
+
+### Login Page
+![Login Page](screenshots/login.png)
+
+### Customer Dashboard
+![Customer Dashboard](screenshots/dashboard.png)
+
+### Transaction History
+![Transaction History](screenshots/transactions.png)
+
+### Admin Dashboard
+![Admin Dashboard](screenshots/admin-dashboard.png)
 
 ### Authentication & Authorization
 - User registration and login.
