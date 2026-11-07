@@ -1,6 +1,7 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { QRCodeSVG } from "qrcode.react";
+import { Html5QrcodeScanner } from "html5-qrcode";
 import {
   Wallet,
   LayoutDashboard,
@@ -54,6 +55,15 @@ function Dashboard() {
   const [destinationAccountId, setDestinationAccountId] = useState("");
   const [transferAmount, setTransferAmount] = useState("");
   const [transferring, setTransferring] = useState(false);
+  const [showQRScanner, setShowQRScanner] = useState(false);
+const [scannerMessage, setScannerMessage] = useState("");
+const startQRScanner = () => {
+  setScannerMessage("");
+  setShowQRScanner(true);
+};
+  // Receive Money QR
+const [showReceiveQR, setShowReceiveQR] = useState(false);
+const [selectedReceiveAccount, setSelectedReceiveAccount] = useState(null);
 
   // Fetch accounts and transaction history when the dashboard loads.
   useEffect(() => {
@@ -667,6 +677,17 @@ const handleTransfer = async (e) => {
                   <span className="account-type">
                     {account.type} ACCOUNT
                   </span>
+                  <button
+  type="button"
+  className="add-account-button"
+  style={{ marginTop: "18px" }}
+  onClick={() => {
+    setSelectedReceiveAccount(account);
+    setShowReceiveQR(true);
+  }}
+>
+  Receive Money
+</button>
 
                 </div>
               ))}
@@ -1006,6 +1027,30 @@ const handleTransfer = async (e) => {
             </form>
 
           </div>
+          {/* QR SCANNER MODAL */}
+{showQRScanner && (
+  <QRScanner
+    onScan={(decodedText) => {
+      const accountId = decodedText.trim();
+
+      const uuidRegex =
+        /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+
+      if (!uuidRegex.test(accountId)) {
+        setScannerMessage("Invalid Account QR Code.");
+        setError("The scanned QR code does not contain a valid Account ID.");
+        setShowQRScanner(false);
+        return;
+      }
+
+      setDestinationAccountId(accountId);
+      setScannerMessage("Account ID scanned successfully!");
+      setShowQRScanner(false);
+      setSuccessMessage("Destination Account ID filled successfully.");
+    }}
+    onClose={() => setShowQRScanner(false)}
+  />
+)}
         </div>
       )}
 
@@ -1173,6 +1218,14 @@ const handleTransfer = async (e) => {
 
         <div className="form-group">
           <label>Destination Account ID (UUID)</label>
+          <button
+  type="button"
+  className="add-account-button"
+  style={{ marginTop: "10px" }}
+  onClick={startQRScanner}
+>
+  Scan QR Code
+</button>
 
           <input
             type="text"
@@ -1238,9 +1291,147 @@ const handleTransfer = async (e) => {
     </div>
   </div>
 )}
+{/* RECEIVE MONEY QR MODAL */}
+{showReceiveQR && selectedReceiveAccount && (
+  <div
+    className="modal-overlay"
+    onClick={() => setShowReceiveQR(false)}
+  >
+    <div
+      className="modal-card"
+      onClick={(e) => e.stopPropagation()}
+    >
+      <div className="modal-header">
+        <div>
+          <h2>Receive Money</h2>
+          <p>Share this QR code to receive money.</p>
+        </div>
+
+        <button
+          className="modal-close"
+          onClick={() => setShowReceiveQR(false)}
+        >
+          <X size={20} />
+        </button>
+      </div>
+
+      <div style={{ textAlign: "center", padding: "20px" }}>
+        <h3 style={{ marginBottom: "12px" }}>
+          {selectedReceiveAccount.accountNumber}
+        </h3>
+
+        <div
+          style={{
+            display: "inline-block",
+            background: "white",
+            padding: "18px",
+            borderRadius: "12px",
+          }}
+        >
+          <QRCodeSVG
+            value={selectedReceiveAccount.id}
+            size={220}
+            level="H"
+            includeMargin
+          />
+        </div>
+
+        <p style={{ marginTop: "15px", color: "#64748b" }}>
+          Scan this QR code to get the destination Account ID.
+        </p>
+
+        <code
+          style={{
+            display: "block",
+            overflowWrap: "anywhere",
+            margin: "15px 0",
+          }}
+        >
+          {selectedReceiveAccount.id}
+        </code>
+
+        <button
+          className="add-account-button"
+          onClick={async () => {
+            try {
+              await navigator.clipboard.writeText(
+                selectedReceiveAccount.id
+              );
+              setSuccessMessage("Account ID copied successfully!");
+              setShowReceiveQR(false);
+            } catch {
+              setError("Unable to copy Account ID.");
+            }
+          }}
+        >
+          Copy Account ID
+        </button>
+      </div>
+    </div>
+  </div>
+)}
 
     </div>
   );
 }
+function QRScanner({ onScan, onClose }) {
+  useEffect(() => {
+    const scanner = new Html5QrcodeScanner(
+      "qr-reader",
+      {
+        fps: 10,
+        qrbox: { width: 250, height: 250 },
+        rememberLastUsedCamera: true,
+      },
+      false
+    );
 
+    scanner.render(
+      (decodedText) => {
+        onScan(decodedText);
+        scanner.clear().catch(() => {});
+      },
+      () => {}
+    );
+
+    return () => {
+      scanner.clear().catch(() => {});
+    };
+  }, [onScan]);
+
+  return (
+    <div className="modal-overlay">
+      <div className="modal-card">
+        <div className="modal-header">
+          <h2>Scan Account QR Code</h2>
+          <button className="modal-close" onClick={onClose}>
+            <X size={20} />
+          </button>
+        </div>
+
+        <div id="qr-reader" style={{ width: "100%" }} />
+
+        <button
+          className="cancel-button"
+          onClick={onClose}
+          style={{ marginTop: "15px" }}
+        >
+          Cancel
+        </button>
+      </div>
+      {showQRScanner && (
+  <QRScanner
+    onScan={(decodedText) => {
+      const accountId = decodedText.trim();
+
+      setDestinationAccountId(accountId);
+      setShowQRScanner(false);
+      setSuccessMessage("Account ID scanned successfully!");
+    }}
+    onClose={() => setShowQRScanner(false)}
+  />
+)}
+    </div>
+  );
+}
 export default Dashboard;
